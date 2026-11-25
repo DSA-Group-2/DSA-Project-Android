@@ -11,11 +11,12 @@ public class API {
 
     private static Retrofit retrofit;
     private static ProductApi github;
+    private static UserApi userApi;
 
     public static Retrofit getRetrofit() {
         if(retrofit==null) {
             HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
             OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
             retrofit = new retrofit2.Retrofit.Builder()
@@ -32,6 +33,13 @@ public class API {
             github = getRetrofit().create(ProductApi.class);
         }
         return github;
+    }
+
+    public static UserApi getUserApi() {
+        if(userApi==null) {
+            userApi = getRetrofit().create(UserApi.class);
+        }
+        return userApi;
     }
 
 }
