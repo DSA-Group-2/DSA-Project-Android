@@ -11,5 +11,7 @@ public interface UserApi {
 
     @POST("user/login")
     Call<Void> login(@Body Credentials credentials);
+    @POST("user/order")
+    Call<Order> comprar(@Body Order pedido);
 
 }

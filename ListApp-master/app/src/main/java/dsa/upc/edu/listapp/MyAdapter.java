@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import dsa.upc.edu.listapp.github.Product;
 import dsa.upc.edu.listapp.github.ProductApi;
+import android.widget.Button;
+import android.widget.Toast;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private List<Product> values;
@@ -25,6 +27,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         public TextView txtHeader;
         public TextView txtFooter;
         public ImageView icon;
+        public Button btnComprar;
         public View layout;
 
         public ViewHolder(View v) {
@@ -33,6 +36,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             txtHeader = (TextView) v.findViewById(R.id.firstLine);
             txtFooter = (TextView) v.findViewById(R.id.secondLine);
             icon = (ImageView) v.findViewById(R.id.icon);
+            btnComprar = (Button) v.findViewById(R.id.btnComprar);
         }
     }
 
@@ -79,17 +83,20 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        Product c = values.get(position);
+        final Product c = values.get(position);
         final String name = c.name;
         holder.txtHeader.setText(name);
-        holder.txtHeader.setOnClickListener(new OnClickListener() {
+
+        holder.txtFooter.setText("Precio: " + c.price + " monedas");
+
+        //Acción al pusar el botón comprar.
+        holder.btnComprar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                remove(holder.getAdapterPosition());
+                MainActivity activity = (MainActivity) v.getContext(); //referencia a MainActivity, para poder usar el metodo creado
+                activity.comprarProducto(c); //envia producto c al metodo comprar
             }
         });
-
-        holder.txtFooter.setText("Contributions: " + c.name);
 
         GlideApp.with(holder.icon.getContext())
                 .load(c.image_url)

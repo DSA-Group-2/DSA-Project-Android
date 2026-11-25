@@ -19,7 +19,7 @@
         android:layout_width="fill_parent"
         android:layout_height="26dip"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_toLeftOf="@id/btnComprar"
         android:layout_toRightOf="@id/icon"
         android:singleLine="true"
         android:text="Description"
@@ -30,12 +30,20 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/secondLine"
-        android:layout_alignParentRight="true"
+        android:layout_toLeftOf="@id/btnComprar"
         android:layout_alignParentTop="true"
         android:layout_alignWithParentIfMissing="true"
         android:layout_toRightOf="@id/icon"
         android:gravity="center_vertical"
         android:text="Example application"
         android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/btnComprar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:text="Comprar" />
 
 </RelativeLayout>
