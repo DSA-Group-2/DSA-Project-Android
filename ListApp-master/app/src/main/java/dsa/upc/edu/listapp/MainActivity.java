@@ -26,9 +26,11 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     //usuario a mano para las pruebas
-    String usuario = "NIF1";
-    double monedas = 100;
+    String usuario;
+    String nombreUsuario;
+    double monedas = 0;
     HashMap<String, Integer> inventario = new HashMap<>();
+    HashMap<String, String> nombresProductos = new HashMap<>();
 
     private RecyclerView recyclerView;
     private MyAdapter adapter;
@@ -42,12 +44,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        nombreUsuario = getIntent().getStringExtra("usuario");
+        usuario = getIntent().getStringExtra("nif");
+
         //guarda usuario y monedas en una variable
         TextView txtUsuario = (TextView) findViewById(R.id.txtUsuario);
         TextView txtMonedas = (TextView) findViewById(R.id.txtMonedas);
 
-        txtUsuario.setText("Usuario: " + usuario);
+        txtUsuario.setText("Usuario: " + nombreUsuario);
         txtMonedas.setText("Monedas: " + monedas);
+
+        cargarMonedas();
 
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         swipeRefreshLayout = findViewById(R.id.my_swipe_refresh);
@@ -104,6 +111,12 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
                 // set the results to the adapter
                 adapter.setData(response.body());
+                if (response.body() != null) {
+                    for (Product producto : response.body()) {
+                        nombresProductos.put(producto.id, producto.name);
+                    }
+                    mostrarInventario();
+                }
 
                 if(mySwipeRefreshLayout!=null) mySwipeRefreshLayout.setRefreshing(false);
             }
@@ -130,6 +143,32 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+    public void cargarMonedas() {
+        UserApi userApi = API.getUserApi();
+        Call<User> call = userApi.getUser(usuario);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    monedas = response.body().getDinero();
+                    TextView txtMonedas = (TextView) findViewById(R.id.txtMonedas);
+                    txtMonedas.setText("Monedas: " + monedas);
+
+                    if (response.body().getInventario() != null) {
+                        inventario = response.body().getInventario();
+                        mostrarInventario();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Error al cargar monedas", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     public void mostrarInventario() {
 
         TextView txtInventario = (TextView) findViewById(R.id.txtInventario);
@@ -137,7 +176,11 @@ public class MainActivity extends AppCompatActivity {
         String texto = "Inventario:\n";
 
         for (String producto : inventario.keySet()) {
-            texto = texto + producto + " x" + inventario.get(producto) + "\n";
+            String nombre = nombresProductos.get(producto);
+            if (nombre == null) {
+                nombre = producto;
+            }
+            texto = texto + nombre + " x" + inventario.get(producto) + "\n";
         }
 
         txtInventario.setText(texto);
@@ -160,21 +203,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if (response.code() == 201) {
 
-                    monedas = monedas - producto.price;
-
-                    TextView txtMonedas = (TextView) findViewById(R.id.txtMonedas);
-                    txtMonedas.setText("Monedas: " + monedas);
-
-                    //añadir producto al inventario
-                    if (inventario.containsKey(producto.name)) {
-                        inventario.put(producto.name, inventario.get(producto.name) + 1);
-                    } else {
-                        inventario.put(producto.name, 1);
-                    }
-
-                    mostrarInventario();
-
+                    cargarMonedas();
                     Toast.makeText(MainActivity.this, "Has comprado " + producto.name, Toast.LENGTH_SHORT).show();
+
+                } else if (response.code() == 409) {
+                     Toast.makeText(MainActivity.this, "No tienes suficientes monedas", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(MainActivity.this, "Error: " + response.code(), Toast.LENGTH_SHORT).show();
                 }

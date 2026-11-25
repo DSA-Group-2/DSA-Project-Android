@@ -1,4 +1,5 @@
 package dsa.upc.edu.listapp.github;
+import java.util.HashMap;
 
 public class User {
 
@@ -7,10 +8,11 @@ public class User {
     private String surname;
     private String mail;
     private String password;
-    private int dinero;
+    private double dinero;
+    private HashMap<String, Integer> inventario;
 
     public User(String nif, String name, String surname,
-                String mail, String password, int dinero) {
+                String mail, String password, double dinero) {
 
         this.nif = nif;
         this.name = name;
@@ -19,4 +21,7 @@ public class User {
         this.password = password;
         this.dinero = dinero;
     }
+
+    public double getDinero() {return dinero;}
+    public HashMap<String, Integer> getInventario() {return inventario;}
 }

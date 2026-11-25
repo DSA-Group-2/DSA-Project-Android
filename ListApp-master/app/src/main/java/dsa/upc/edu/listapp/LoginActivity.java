@@ -15,6 +15,7 @@ import dsa.upc.edu.listapp.github.UserApi;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import java.util.HashMap;
 
 public class
 LoginActivity extends AppCompatActivity {
@@ -55,15 +56,22 @@ LoginActivity extends AppCompatActivity {
                 );
 
                 UserApi userService = API.getUserApi();
-                Call<Void> call = userService.login(credentials);
+                Call<HashMap<String, String>> call = userService.login(credentials);
+                call.enqueue(new Callback<HashMap<String, String>>() {                    @Override
+                    public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response){
+                        if (response.code() == 200 && response.body() != null) {
 
-                call.enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-
-                        if (response.code() == 200) {
                             textView.setText("Correct login");
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+                            String nif = response.body().get("nif");
+                            String nombre = response.body().get("name");
+
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+
+                            intent.putExtra("usuario", nombre);
+                            intent.putExtra("nif", nif);
+
+                            startActivity(intent);
                         }
                         else if (response.code() == 401) {
                             textView.setText("Incorrect username or password");
@@ -74,7 +82,7 @@ LoginActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
+                    public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
                         textView.setText("Something went wrong: " + t.getMessage());
                     }
                 });
