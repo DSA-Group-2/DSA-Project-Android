@@ -9,4 +9,7 @@ public interface UserApi {
     @POST("user/register")
     Call<Void> register(@Body User user);
 
+    @POST("user/login")
+    Call<Void> login(@Body Credentials credentials);
+
 }

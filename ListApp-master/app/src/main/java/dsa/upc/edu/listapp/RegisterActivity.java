@@ -15,14 +15,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RegisterActivity extends AppCompatActivity {
+public class
+RegisterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        Button button = (Button) findViewById(R.id.registerButton);
+        Button button = (Button) findViewById(R.id.loginButton);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
